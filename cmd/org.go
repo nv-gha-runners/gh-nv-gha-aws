@@ -2,8 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"strconv"
+	"os"
 
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/spf13/cobra"
@@ -18,26 +17,33 @@ var orgCmd = &cobra.Command{
 
 		client, err := api.DefaultRESTClient()
 		if err != nil {
-			log.Fatalf("Error while initializing REST client %v", err)
+			fmt.Printf("Error while initializing REST client %v", err)
+			os.Exit(1)
 		}
 
 		var response GHResponse
 		err = client.Get(fmt.Sprintf("orgs/%s", orgName), &response)
 		if err != nil {
-			log.Fatalf("Error while accessing org %v", err)
+			fmt.Printf("Error while accessing org %v", err)
+			os.Exit(1)
 		}
 
-		ghToken := getAuthToken()
+		ghToken := getGHToken()
 
-		orgId := strconv.Itoa(response.Id)
-		jwtQuery := fmt.Sprintf("%s/gh/org/%s?audience=%s", getFlag(command, "idp-url"), orgId, getFlag(command, "aud"))
+		jwtQuery := fmt.Sprintf("%s/gh/org/%d?audience=%s", getFlag(command, "idp-url"), response.Id, getFlag(command, "aud"))
 		jwtToken := getJWTToken(jwtQuery, ghToken)
 
-		awsCredOutput := assumeRole(jwtToken, getFlag(command, "role-arn"))
-		creds := getCreds(awsCredOutput)
+		var user GHUser
+		err = client.Get("user", &user)
+		if err != nil {
+			fmt.Printf("Error while accessing user information %v", err)
+			os.Exit(1)
+		}
 
-		writeAWSCredentials(creds, command)
-		printOutput(creds, command)
+		awsCredOutput := assumeRole(jwtToken, getFlag(command, "role-arn"), user.Username)
+
+		writeAWSCredentials(awsCredOutput, command)
+		printOutput(awsCredOutput, command)
 	},
 }
 

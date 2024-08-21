@@ -5,3 +5,15 @@ BUILD_FLAGS = -tags osusergo,netgo \
 
 build:
 	go build -o $(BIN_NAME) $(BUILD_FLAGS)
+
+check: gofmt-verify ci-lint
+
+gofmt-verify:
+	@out=`gofmt -w -l -d $$(find . -name '*.go')`; \
+		if [ -n "$$out" ]; then \
+		echo "$$out"; \
+		exit 1; \
+		fi
+
+ci-lint:
+	@docker run --pull always --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run

@@ -1,4 +1,4 @@
-module nv-gha-aws
+module github.com/nv-gha-runners/gh-nv-gha-aws
 
 go 1.22.4
 

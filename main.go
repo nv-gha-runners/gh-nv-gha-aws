@@ -1,7 +1,7 @@
 package main
 
 import (
-	"nv-gha-aws/cmd"
+	"github.com/nv-gha-runners/gh-nv-gha-aws/cmd"
 )
 
 func main() {

@@ -2,8 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"strconv"
+	"os"
 
 	"github.com/cli/go-gh/v2/pkg/api"
 	"github.com/spf13/cobra"
@@ -19,7 +18,8 @@ var teamCmd = &cobra.Command{
 
 		client, err := api.DefaultRESTClient()
 		if err != nil {
-			log.Fatalf("Error while initializing REST client %v", err)
+			fmt.Printf("Error while initializing REST client %v", err)
+			os.Exit(1)
 		}
 
 		var orgResponse GHResponse
@@ -27,26 +27,32 @@ var teamCmd = &cobra.Command{
 
 		err = client.Get(fmt.Sprintf("orgs/%s", orgName), &orgResponse)
 		if err != nil {
-			log.Fatalf("Error while accessing org %v", err)
+			fmt.Printf("Error while accessing org %v", err)
+			os.Exit(1)
 		}
 
 		err = client.Get(fmt.Sprintf("orgs/%s/teams/%s", orgName, teamName), &teamResponse)
 		if err != nil {
-			log.Fatalf("Error while accessing Team %v", err)
+			fmt.Printf("Error while accessing Team %v", err)
+			os.Exit(1)
 		}
 
-		authToken := getAuthToken()
+		authToken := getGHToken()
 
-		orgId := strconv.Itoa(orgResponse.Id)
-		teamId := strconv.Itoa(teamResponse.Id)
-		jwtQuery := fmt.Sprintf("%s/gh/team/%s/%s?audience=%s", getFlag(command, "idp-url"), orgId, teamId, getFlag(command, "aud"))
+		jwtQuery := fmt.Sprintf("%s/gh/team/%d/%d?audience=%s", getFlag(command, "idp-url"), orgResponse.Id, teamResponse.Id, getFlag(command, "aud"))
 		jwtToken := getJWTToken(jwtQuery, authToken)
 
-		awsCredOutput := assumeRole(jwtToken, getFlag(command, "role-arn"))
-		creds := getCreds(awsCredOutput)
+		var user GHUser
+		err = client.Get("user", &user)
+		if err != nil {
+			fmt.Printf("Error while accessing user information %v", err)
+			os.Exit(1)
+		}
 
-		writeAWSCredentials(creds, command)
-		printOutput(creds, command)
+		awsCredOutput := assumeRole(jwtToken, getFlag(command, "role-arn"), user.Username)
+
+		writeAWSCredentials(awsCredOutput, command)
+		printOutput(awsCredOutput, command)
 	},
 }
 
