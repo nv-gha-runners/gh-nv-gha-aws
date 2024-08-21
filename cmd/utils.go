@@ -60,7 +60,7 @@ func assumeRole(token string, arn string, user string) *sts.AssumeRoleWithWebIde
 }
 
 func getGHToken() string {
-	// getAuthToken will get the user's PAT using the GitHub CLI
+	// getGHToken will get the user's PAT using the GitHub CLI
 	authToken, _ := auth.TokenForHost("github.com")
 	if authToken == "" {
 		fmt.Printf("Error: Unable to getGH Token")
