@@ -43,8 +43,7 @@ func init() {
 
 		printFormatFlag := getFlag(cmd, "output")
 
-		// We must assert that the -w flag is set
-		// ensures that the file and the writeFlag must be set at same time
+		// ensures that the writeFlag must be set in order to set the file flag
 		if cmd.Flags().Changed("file") && !writeFlag {
 			return errors.New("the write flag must be set if specifying a file path")
 		}

@@ -14,10 +14,10 @@
 There are two main subcommands that can be run in order to receive temporary AWS Credentials.
 
 1. `gh nv-gha-aws org <ORG_NAME>`
-    - This commands requires you to provide an organization name and will check if you are a member of this organization and will authenticate you if you are.
+    - This commands requires you to provide an organization name and will provide temporary AWS credentials if you are a member of a valid organization. 
 
 2. `gh nv-gha-aws team <ORG_NAME> <TEAM_NAME>`
-    - This commands requires you to provide an organization name and team name and will check if you are a member of this organization and this team and will authenticate you if you are.
+    - This commands requires you to provide an organization name and team name and will provide temporary AWS Credentials if you are a member of a valid organization and team.
 
 Both subcommands will require you to pass in a `role-arn` using the `--role-arn` flag. 
 
