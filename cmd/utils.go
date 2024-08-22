@@ -69,7 +69,7 @@ func getGHToken() string {
 	// getGHToken will get the user's PAT using the GitHub CLI
 	authToken, _ := auth.TokenForHost("github.com")
 	if authToken == "" {
-		fmt.Printf("Error: Unable to getGH Token")
+		fmt.Println("Error: Unable to getGH Token")
 		os.Exit(1)
 	}
 	return authToken
@@ -144,7 +144,7 @@ func printOutput(creds *sts.AssumeRoleWithWebIdentityOutput, command *cobra.Comm
 		profile := getFlag(command, "profile")
 		printCredsFormat(creds, profile)
 	} else {
-		fmt.Printf("Invalid Output Format")
+		fmt.Println("Invalid Output Format")
 		os.Exit(1)
 	}
 }
