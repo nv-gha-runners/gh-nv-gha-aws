@@ -6,6 +6,9 @@ BUILD_FLAGS = -tags osusergo,netgo \
 build:
 	go build -o $(BIN_NAME) $(BUILD_FLAGS)
 
+gofmt:
+	@gofmt -w -l $$(find . -name '*.go')
+
 check: gofmt-verify ci-lint
 
 gofmt-verify:
@@ -17,3 +20,6 @@ gofmt-verify:
 
 ci-lint:
 	@docker run --pull always --rm -v $(PWD):/app -w /app golangci/golangci-lint:latest golangci-lint run
+
+clean:
+	@rm -f $(BIN_NAME)

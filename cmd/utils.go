@@ -28,7 +28,7 @@ type GHUser struct {
 	Username string `json:"login"`
 }
 
-func assumeRole(token string, arn string, user string) *sts.AssumeRoleWithWebIdentityOutput {
+func assumeRole(cmd *cobra.Command, token string, arn string, user string) *sts.AssumeRoleWithWebIdentityOutput {
 	// assumeRole will assume the AWS role from the provided ARN using the
 	// AWS AssumeRoleWithWebIdentity functionality
 	cfg, err := config.LoadDefaultConfig(
@@ -38,17 +38,23 @@ func assumeRole(token string, arn string, user string) *sts.AssumeRoleWithWebIde
 
 	if err != nil {
 		fmt.Printf("Error while loading config %v", err)
+		os.Exit(1)
 	}
 
 	stsClient := sts.NewFromConfig(cfg)
 	sessionName := fmt.Sprintf("nv-gha-aws-%s", user)
-	var durationSessions int32 = 43200 // 12 Hours in Seconds
+	sessionDuration, err := cmd.Flags().GetInt32("duration")
+
+	if err != nil {
+		fmt.Printf("Error while getting duration flag %v", err)
+		os.Exit(1)
+	}
 
 	input := sts.AssumeRoleWithWebIdentityInput{
 		RoleArn:          &arn,
 		RoleSessionName:  &sessionName,
 		WebIdentityToken: &token,
-		DurationSeconds:  &durationSessions,
+		DurationSeconds:  &sessionDuration,
 	}
 
 	output, err := stsClient.AssumeRoleWithWebIdentity(context.TODO(), &input)
@@ -106,12 +112,16 @@ func getJWTToken(url string, ghToken string) string {
 	return jwtToken.Token
 }
 
-func prettyPrint(awsCreds *sts.AssumeRoleWithWebIdentityOutput, profile string) {
-	// prettyPrint will print the output in the same format as the AWS Credentials file
-	if len(profile) > 0 {
-		fmt.Printf("[%s]\n", profile)
-	}
+func printCredsFormat(awsCreds *sts.AssumeRoleWithWebIdentityOutput, profile string) {
+	// printCredsFormat will print in the format of the AWS Credentials File
+	fmt.Printf("[%s]\n", profile)
+	fmt.Printf("%s=%s\n", "aws_access_key_id", *awsCreds.Credentials.AccessKeyId)
+	fmt.Printf("%s=%s\n", "aws_secret_access_key", *awsCreds.Credentials.SecretAccessKey)
+	fmt.Printf("%s=%s\n", "aws_session_token", *awsCreds.Credentials.SessionToken)
+}
 
+func printShellFormat(awsCreds *sts.AssumeRoleWithWebIdentityOutput) {
+	// printShellFormat will print in format of exporting AWS Credentials Environment Variables
 	fmt.Printf("EXPORT %s=%s\n", "AWS_ACCESS_KEY_ID", *awsCreds.Credentials.AccessKeyId)
 	fmt.Printf("EXPORT %s=%s\n", "AWS_SECRET_ACCESS_KEY", *awsCreds.Credentials.SecretAccessKey)
 	fmt.Printf("EXPORT %s=%s\n", "AWS_SESSION_TOKEN", *awsCreds.Credentials.SessionToken)
@@ -120,34 +130,34 @@ func prettyPrint(awsCreds *sts.AssumeRoleWithWebIdentityOutput, profile string) 
 func printOutput(creds *sts.AssumeRoleWithWebIdentityOutput, command *cobra.Command) {
 	// printOutput will print the AWS Credentials to the Command line based on the
 	// format that they provided
-	if getFlag(command, "output") == "pretty" {
-		prettyPrint(creds, getFlag(command, "profile"))
-	} else if getFlag(command, "output") == "json" {
+	outputFlag := getFlag(command, "output")
+	if outputFlag == "shell" {
+		printShellFormat(creds)
+	} else if outputFlag == "json" {
 		jsonOutput, err := json.MarshalIndent(creds.Credentials, "", "  ")
 		if err != nil {
 			fmt.Printf("Error Marshalling JSON for output %v", err)
 			os.Exit(1)
 		}
 		fmt.Printf("%s\n", jsonOutput)
+	} else if outputFlag == "creds-file" {
+		profile := getFlag(command, "profile")
+		printCredsFormat(creds, profile)
 	} else {
 		fmt.Printf("Invalid Output Format")
 		os.Exit(1)
 	}
 }
 
-func writeToAWSCredsFile(awsCredOutput *sts.AssumeRoleWithWebIdentityOutput, profile string) {
-	// writeToAWSCredsFile writes to the user's local ~/.aws/credentials file under the
-	// profile that they specify
-	if profile == "" {
-		profile = "default"
-	}
+func writeCredsToFile(awsCredOutput *sts.AssumeRoleWithWebIdentityOutput, path string, profile string) {
+	// writeCredsToFile writes to the user's specified filepath with the profile that they specify
 
 	homeDir, _ := os.UserHomeDir()
-	awsCredentialsPath := filepath.Join(homeDir, ".aws", "credentials")
+	credFilePath := filepath.Join(homeDir, path)
 
-	config, err := ini.LoadFiles(awsCredentialsPath)
+	config, err := ini.LoadExists(credFilePath)
 	if err != nil {
-		fmt.Printf("AWS Credentials file does not exist %v", err)
+		fmt.Printf("Error loading %s. %v", credFilePath, err)
 		os.Exit(1)
 	}
 
@@ -159,13 +169,14 @@ func writeToAWSCredsFile(awsCredOutput *sts.AssumeRoleWithWebIdentityOutput, pro
 
 	err = config.SetSection(profile, awsCredsMap)
 	if err != nil {
-		fmt.Printf("Error setting AWS Credentials file values %v", err)
+		fmt.Printf("Error setting %s values %v", credFilePath, err)
 		os.Exit(1)
 	}
 
-	_, err = config.WriteToFile(awsCredentialsPath)
+	// Will create file if file does not exist
+	_, err = config.WriteToFile(credFilePath)
 	if err != nil {
-		fmt.Printf("Error writing to AWS Credentials file %v", err)
+		fmt.Printf("Error writing to %s %v", credFilePath, err)
 		os.Exit(1)
 	}
 }
@@ -173,18 +184,15 @@ func writeToAWSCredsFile(awsCredOutput *sts.AssumeRoleWithWebIdentityOutput, pro
 func writeAWSCredentials(creds *sts.AssumeRoleWithWebIdentityOutput, command *cobra.Command) {
 	// writeAWSCredentials gets the AWS Credentials and writes them to the user's AWS Credentials File if specified
 
-	writeToAWS, err := command.Flags().GetBool("write-to-file")
+	writeToAWS, err := command.Flags().GetBool("write")
 	if err != nil {
 		fmt.Printf("Error getting write flag %v", err)
 		os.Exit(1)
 	}
 
-	profile := getFlag(command, "profile")
-
 	if writeToAWS {
-		writeToAWSCredsFile(creds, profile)
-	} else if !writeToAWS && profile != "" {
-		fmt.Print("Must set write-to-file flag if specifying a profile")
-		os.Exit(1)
+		filepath := getFlag(command, "file")
+		profile := getFlag(command, "profile")
+		writeCredsToFile(creds, filepath, profile)
 	}
 }

@@ -49,7 +49,7 @@ var teamCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		awsCredOutput := assumeRole(jwtToken, getFlag(command, "role-arn"), user.Username)
+		awsCredOutput := assumeRole(command, jwtToken, getFlag(command, "role-arn"), user.Username)
 
 		writeAWSCredentials(awsCredOutput, command)
 		printOutput(awsCredOutput, command)
