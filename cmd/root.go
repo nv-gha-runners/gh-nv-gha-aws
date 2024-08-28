@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -12,11 +13,13 @@ const (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   programName,
-	Short: "A GitHub CLI Extension Tool to receive AWS Credentials",
+	Use:          programName,
+	Short:        "A GitHub CLI Extension Tool to receive AWS Credentials",
+	SilenceUsage: true,
 }
 
-func Execute() {
+func Execute(version string) {
+	rootCmd.Version = version
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -32,16 +35,19 @@ func init() {
 	rootCmd.PersistentFlags().Int32P("duration", "d", 43200, "The maximum session duration with the temporary AWS Credentials in seconds")
 	rootCmd.PersistentFlags().StringP("output", "o", "shell", "Output format of credentials in one of: shell, json, or creds-file format")
 	rootCmd.PersistentFlags().BoolP("write", "w", false, "Specifies if Credentials should be written to AWS Credentials file")
-	rootCmd.PersistentFlags().StringP("file", "f", ".aws/credentials", "File path to write AWS Credentials to relative to the home directory")
+	rootCmd.PersistentFlags().StringP("file", "f", "$HOME/.aws/credentials", "File path to write AWS Credentials")
 	rootCmd.PersistentFlags().StringP("profile", "p", "default", "Profile where credentials should be written to in AWS Credentials File")
 
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		writeFlag, err := cmd.Flags().GetBool("write")
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get --write flag: %w", err)
 		}
 
-		printFormatFlag := getFlag(cmd, "output")
+		printFormatFlag, err := cmd.Flags().GetString("output")
+		if err != nil {
+			return fmt.Errorf("failed to get --output flag: %w", err)
+		}
 
 		// ensures that the writeFlag must be set in order to set the file flag
 		if cmd.Flags().Changed("file") && !writeFlag {
