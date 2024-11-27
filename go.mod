@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.32.3
 	github.com/aws/aws-sdk-go-v2/config v1.28.1
 	github.com/aws/aws-sdk-go-v2/service/sts v1.32.3
-	github.com/cli/go-gh/v2 v2.11.0
+	github.com/cli/go-gh/v2 v2.11.1
 	github.com/gookit/ini v1.1.1
 	github.com/gookit/ini/v2 v2.2.3
 	github.com/spf13/cobra v1.8.1
