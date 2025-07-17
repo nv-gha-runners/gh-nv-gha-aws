@@ -106,7 +106,7 @@ var teamCmd = &cobra.Command{
 			Username: username,
 		})
 		if err != nil {
-			return fmt.Errorf("failed to fet AWS credentials: %w", err)
+			return fmt.Errorf("failed to get AWS credentials: %w", err)
 		}
 
 		if err = creds.Print(output); err != nil {
