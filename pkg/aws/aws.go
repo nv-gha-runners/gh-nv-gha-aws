@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sts"
-	"github.com/gookit/ini"
+	"github.com/gookit/ini/v2"
 )
 
 type Credentials struct {
@@ -90,7 +90,8 @@ func (creds *Credentials) printFile() error {
 }
 
 func (creds *Credentials) Write(path string) error {
-	credsFile, err := ini.LoadExists(os.ExpandEnv(path))
+	credsFile := ini.New()
+	err := credsFile.LoadExists(os.ExpandEnv(path))
 	if err != nil {
 		return fmt.Errorf("failed to load file: %w", err)
 	}
