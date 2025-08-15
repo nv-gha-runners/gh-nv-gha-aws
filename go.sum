@@ -38,10 +38,16 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-viper/mapstructure/v2 v2.3.0 h1:27XbWsHIqhbdR5TIC911OfYvgSaW93HM+dX7970Q7jk=
 github.com/go-viper/mapstructure/v2 v2.3.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
+github.com/go-viper/mapstructure/v2 v2.4.0 h1:EBsztssimR/CONLSZZ04E8qAkxNYq4Qp9LvH92wZUgs=
+github.com/go-viper/mapstructure/v2 v2.4.0/go.mod h1:oJDH3BJKyqBA2TXFhDsKDGDTlndYOZ6rGS0BRZIxGhM=
 github.com/gookit/goutil v0.7.0 h1:HD4PUDW2LOSKIEBJPFD8PzNGLsL46ztpfXWVU+WtAxk=
 github.com/gookit/goutil v0.7.0/go.mod h1:vJS9HXctYTCLtCsZot5L5xF+O1oR17cDYO9R0HxBmnU=
+github.com/gookit/goutil v0.7.1 h1:AaFJPN9mrdeYBv8HOybri26EHGCC34WJVT7jUStGJsI=
+github.com/gookit/goutil v0.7.1/go.mod h1:vJS9HXctYTCLtCsZot5L5xF+O1oR17cDYO9R0HxBmnU=
 github.com/gookit/ini/v2 v2.3.1 h1:uTTJrxHBqbm/Ob2rIq4AwakWReu+JDIvvfiM9poqCpI=
 github.com/gookit/ini/v2 v2.3.1/go.mod h1:uVMSZMeiFrXO+x0bb/hGaZrF+0F7KWmF2GylzHkCcnU=
+github.com/gookit/ini/v2 v2.3.2 h1:W6tzOGE6zOLQelH2xhcH8BIBZPtnEpJgQ+J6SsAKBSw=
+github.com/gookit/ini/v2 v2.3.2/go.mod h1:StKSqY5niArRwYBS8Z71+iWUt5ow47qt359sS9YQLYY=
 github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 h1:2VTzZjLZBgl62/EtslCrtky5vbi9dd7HrQPQIx6wqiw=
 github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542/go.mod h1:Ow0tF8D4Kplbc8s8sSb3V2oUCygFHVp8gC3Dn6U4MNI=
 github.com/henvic/httpretty v0.1.4 h1:Jo7uwIRWVFxkqOnErcoYfH90o3ddQyVrSANeS4cxYmU=

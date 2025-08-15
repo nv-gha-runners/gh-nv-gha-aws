@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.29.17
 	github.com/aws/aws-sdk-go-v2/service/sts v1.34.0
 	github.com/cli/go-gh/v2 v2.12.1
-	github.com/gookit/ini/v2 v2.3.1
+	github.com/gookit/ini/v2 v2.3.2
 	github.com/spf13/cobra v1.9.1
 )
 
@@ -27,8 +27,8 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/cli/shurcooL-graphql v0.0.4 // indirect
-	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
-	github.com/gookit/goutil v0.7.0 // indirect
+	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
+	github.com/gookit/goutil v0.7.1 // indirect
 	github.com/henvic/httpretty v0.1.4 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
