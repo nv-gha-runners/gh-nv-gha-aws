@@ -25,6 +25,12 @@ func GetTeamJWT(inputs *JWTInputs, orgID int, teamID int) (string, error) {
 	return getJWT(queryUrl, inputs.GHToken)
 }
 
+func GetEnterpriseJWT(inputs *JWTInputs, enterpriseID string) (string, error) {
+	queryUrl := fmt.Sprintf("%s/gh/enterprise/%s?audience=%s", inputs.IDPUrl, enterpriseID,
+		inputs.Audience)
+	return getJWT(queryUrl, inputs.GHToken)
+}
+
 func getJWT(queryUrl string, ghToken string) (string, error) {
 	req, err := http.NewRequest("GET", queryUrl, nil)
 	if err != nil {
