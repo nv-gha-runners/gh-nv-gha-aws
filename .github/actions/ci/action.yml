@@ -5,7 +5,6 @@ runs:
   using: composite
   steps:
     - uses: jdx/mise-action@ca0c5fc9c8a8386dae8ba5d37608a083a307991c # v3.1.0
-      shell: bash
     - name: Cache Go
       uses: actions/cache@v4
       with:
@@ -17,8 +16,8 @@ runs:
         restore-keys: |
           ${{ runner.os }}-go-
     - name: Lint
+      shell: bash
       run: mise lint
-      shell: bash
     - name: Test
-      run: mise test
       shell: bash
+      run: mise test
