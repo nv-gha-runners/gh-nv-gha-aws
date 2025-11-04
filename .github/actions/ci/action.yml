@@ -1,0 +1,24 @@
+name: CI Checks
+description: Run lint and test checks with mise
+
+runs:
+  using: composite
+  steps:
+    - uses: jdx/mise-action@ca0c5fc9c8a8386dae8ba5d37608a083a307991c # v3.1.0
+      shell: bash
+    - name: Cache Go
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+          ~/.cache/golangci-lint
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Lint
+      run: mise lint
+      shell: bash
+    - name: Test
+      run: mise test
+      shell: bash

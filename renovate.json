@@ -1,6 +1,35 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    ":configMigration",
+    "group:allNonMajor",
+    "schedule:monthly"
+  ],
+  "ignoreDeps": ["jdx/mise-action"],
+  "packageRules": [
+    {
+      "description": "Disable built-in mise manager",
+      "matchManagers": ["mise"],
+      "enabled": false
+    },
+    {
+      "description": "Group mise.toml dependencies together",
+      "matchFileNames": ["mise.toml"],
+      "groupName": "mise",
+      "groupSlug": "mise"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update mise dependencies",
+      "managerFilePatterns": ["/^mise.toml$/"],
+      "matchStrings": [
+        "# renovate: packageName=(?<packageName>.+?)(?: datasource=(?<datasource>[a-z-]+?))?(?: versioning=(?<versioning>[a-z-]+?))?(?: extractVersion=(?<extractVersion>.+?))?\\n[\\w_:-]+\\s=\\s\"(?<currentValue>.+?)\"",
+        "# renovate: packageName=(?<packageName>.+?)(?: datasource=(?<datasource>[a-z-]+?))?(?: versioning=(?<versioning>[a-z-]+?))?(?: extractVersion=(?<extractVersion>.+?))?\\n[\"\\w_:/-]+\\s=\\s\\{[^}]*?version\\s*=\\s*\"(?<currentValue>.+?)\""
+      ],
+      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}github-tags{{/if}}"
+    }
   ]
 }
