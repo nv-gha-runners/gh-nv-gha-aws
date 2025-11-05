@@ -11,4 +11,3 @@
 3. Run `gh extension install nv-gha-aws`
 
 More information about all of the available flags and their associated usage is available when running `gh nv-gha-aws --help`
-

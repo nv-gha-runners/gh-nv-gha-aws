@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#MISE description="Build Go binaries for multiple architectures"
+#USAGE flag "-t --tag <tag>" help="Version tag for the release (defaults to VERSION)"
+
+set -euo pipefail
+
+TAG="${usage_tag:-$VERSION}"
+PLATFORMS="${PLATFORMS:-linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64 windows/arm64}"
+
+mkdir -p dist
+
+for platform in $PLATFORMS; do
+  os="${platform%%/*}"
+  arch="${platform##*/}"
+
+  ext=""
+  if [ "$os" = "windows" ]; then
+    ext=".exe"
+  fi
+
+  # If tag is provided, use release naming format
+  if [ -n "${usage_tag:-}" ]; then
+    output="dist/${BIN_NAME}_${TAG}_${os}-${arch}${ext}"
+  else
+    output="dist/$BIN_NAME-$os-$arch$ext"
+  fi
+
+  echo "Building for $platform..."
+  GOOS=$os GOARCH=$arch CGO_ENABLED=0 \
+    go build -v -tags osusergo,netgo \
+    -ldflags "-s -w -extldflags=-static -X main.version=$TAG" \
+    -o "$output"
+done
+
+ls dist
