@@ -1,10 +1,10 @@
 [tools]
 # renovate: packageName=rhysd/actionlint extractVersion=^v(?<version>.*)$
-actionlint = "1.7.8"
+actionlint = "1.7.10"
 # renovate: packageName=golang/go extractVersion=^go(?<version>.*)$
-go = "1.25.3"
+go = "1.25.5"
 # renovate: packageName=golangci/golangci-lint extractVersion=^v(?<version>.*)$
-golangci-lint = "2.6.1"
+golangci-lint = "2.7.2"
 # renovate: packageName=evilmartians/lefthook extractVersion=^v(?<version>.*)$
 "asdf:jtzero/asdf-lefthook" = { version = "1.13.6", postinstall = "lefthook install" }
 # renovate: packageName=pipxproject/pipx extractVersion=^(?<version>.*)$
